@@ -75,7 +75,7 @@ public class JWTUtil {
         Instant exp = jwtEntity.getLastLoginTime().atZone(ZoneId.systemDefault()).toInstant();
         Instant now = Instant.now();
         //如果超过记住密码的期限或者是设置未记住密码,直接返回 null
-        if (!jwtEntity.getIsRemember().equals("Y") || (now.getEpochSecond() - exp.getEpochSecond()) > rememberTime) {
+        if (!jwtEntity.getIsRemember() || (now.getEpochSecond() - exp.getEpochSecond()) > rememberTime) {
             return null;
         }
         //否则生成刷新的Token,并重新设置数据库中JWT的信息
@@ -83,7 +83,7 @@ public class JWTUtil {
         String token = createToken(jwtToken.getSubject(), now, newExp);
         LocalDateTime lastLoginTime = getLastLoginTime(newExp);
         //把新的token存入到数据库中
-        jwtService.saveJwt(new JWTEntity(jwtToken.getSubject(),token, lastLoginTime, "Y"));
+        jwtService.saveJwt(new JWTEntity(jwtToken.getSubject(),token, lastLoginTime, true));
 
         return token;
     }
@@ -98,7 +98,7 @@ public class JWTUtil {
         Instant newExp = now.plusSeconds(expiration);
         String token = createToken(jwtToken.getSubject(), now, newExp);
         //把新的token存入到数据库中
-        jwtService.saveJwt(new JWTEntity(jwtToken.getSubject(),token, getLastLoginTime(now), "N"));
+        jwtService.saveJwt(new JWTEntity(jwtToken.getSubject(),token, getLastLoginTime(now), false));
         return token;
     }
 
@@ -110,7 +110,6 @@ public class JWTUtil {
      * @return
      */
     private static String createToken(String sub, Instant iat, Instant exp) {
-        System.out.println(JWTUtil.secret);
         return JWT.create()
                 .withClaim("sub", sub)
                 .withClaim("iat", Date.from(iat))

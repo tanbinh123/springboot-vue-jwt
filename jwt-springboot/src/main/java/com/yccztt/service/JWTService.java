@@ -5,6 +5,8 @@ import com.yccztt.repository.JWTEntityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+
 /**
  * @Author hyz
  * @Date 2021/7/26
@@ -19,6 +21,7 @@ public class JWTService {
      * 保存jwt数据
      * @param entity
      */
+    @Transactional
     public void saveJwt(JWTEntity entity) {
         jwtEntityRepository.save(entity);
     }
@@ -37,6 +40,7 @@ public class JWTService {
      * 删除jwt数据
      * @param userId
      */
+    @Transactional
     public void deleteJwt(String userId) {
         jwtEntityRepository.deleteJWTEntityById(userId);
     }

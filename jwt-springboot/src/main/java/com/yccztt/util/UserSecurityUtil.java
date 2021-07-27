@@ -28,55 +28,60 @@ public class UserSecurityUtil {
     @Autowired
     private JWTService jwtService;
 
+    /**
+     * 校验token
+     * @param req
+     * @param resp
+     * @return
+     */
     public boolean verifyWebToken(HttpServletRequest req, HttpServletResponse resp) {
-        // 获取请求头中的 authorization 信息
+        //获取请求头中的 authorization 信息
         String token = req.getHeader("authorization");
-        // 如果为空直接返回 false
         if (token == null) {
             return false;
         }
-        // 解码 Token 信息, 如果为空直接返回 false
+
+        //解析token
         DecodedJWT jwtToken = JWTUtil.decode(token);
         if (jwtToken == null) {
             return false;
         }
-        // 获取 Token 信息中的用户 id 信息
-        String uid = jwtToken.getSubject();
 
-        // 根据 uid 到 redis 中获取 JwtEntity 实体信息
+        // 获取token中的用户id
+        String uid = jwtToken.getSubject();
+        //根据id获取JWT实体类
         JWTEntity queryJwt = jwtService.queryJwt(uid);
 
         try {
-            // 继续校验
+            //校验token
             JWTUtil.verifyToken(token);
         } catch (SignatureVerificationException e) {
-            // 出现签名校验异常直接返回 false
+            //签名校验异常
             return false;
         } catch (TokenExpiredException e) {
-            // 如果过期, 判断是否符合获得刷新 Token 的条件
-            // 如果返回为空, 说明 Token 过期, 删除 redis 中的信息, 并返回 false
+            //token过期,判断是否符合获得刷新Token的条件
             String newToken = JWTUtil.getRefreshToken(jwtToken, queryJwt);
             if (newToken == null) {
                 jwtService.deleteJwt(uid);
                 return false;
             }
-            // 否则说明符合 token 刷新条件, 设置返回头部的 authorization, 并返回 true
+            //否则说明符合token刷新条件,设置返回头部的authorization,并返回true
             resp.setHeader("authorization", newToken);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
-        // 校验成功, 判断是否为不记住密码, 且 Token剩余有效时间小于某个特定值
-        // 若小于某个特定时间, 则刷新 Token
-        if (!queryJwt.getIsRemember().equals("N")) {
+        // 校验成功,判断是否为不记住密码,且Token剩余有效时间小于某个特定值
+        if (!queryJwt.getIsRemember()) {
             Instant exp = queryJwt.getLastLoginTime().atZone(ZoneId.systemDefault()).toInstant();
             Instant now = Instant.now();
+            //若小于某个特定时间,则刷新Token
             if (now.getEpochSecond() - exp.getEpochSecond() <= validateTime) {
                 token = JWTUtil.getRefreshToken(jwtToken);
             }
         }
-        // 设置返回头中的 token
+        //设置返回头中的token
         resp.setHeader("authorization", token);
         return true;
     }

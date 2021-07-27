@@ -6,6 +6,7 @@ import com.yccztt.repository.JWTEntityRepository;
 import com.yccztt.repository.JWTUserRepository;
 import com.yccztt.util.JWTUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -58,11 +59,7 @@ public class UserService {
         String token = JWTUtil.createToken(userId, now);
         LocalDateTime lastLoginTime = LocalDateTime.ofInstant(now, ZoneId.systemDefault());
         //存入到数据库中
-        String remember = "N";
-        if (isRemember!=false) {
-            remember = "Y";
-        }
-        entityRepository.save(new JWTEntity(userId,token,lastLoginTime,remember));
+        entityRepository.save(new JWTEntity(userId,token,lastLoginTime, isRemember != null && isRemember));
         return token;
     }
 

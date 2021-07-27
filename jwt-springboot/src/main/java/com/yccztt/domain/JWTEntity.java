@@ -1,9 +1,5 @@
 package com.yccztt.domain;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,14 +23,13 @@ import java.time.LocalDateTime;
 public class JWTEntity {
 
     @Id
+    @Column(name = "id")
     private String id;
     @Column(name = "token")
     private String token;
-//    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-//    @JsonSerialize(using = LocalDateTimeSerializer.class)
     @Column(name = "lastLoginTime")
     private LocalDateTime lastLoginTime;
     @Column(name = "isRemember")
-    private String isRemember;
+    private Boolean isRemember;
 
 }
