@@ -40,7 +40,7 @@ public class WebConfig extends WebMvcConfigurationSupport {
     protected void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(httpInterceptor)
                 .addPathPatterns("/**")
-                .excludePathPatterns("/login", "/error");
+                .excludePathPatterns("/excHello","/login", "/error");
         super.addInterceptors(registry);
     }
 
