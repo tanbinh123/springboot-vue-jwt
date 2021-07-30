@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import Index from '../views/Index.vue'
 import Login from '../views/Login.vue'
 import Home from '../views/Home'
 
@@ -11,17 +12,18 @@ const router = new Router({
   routes: [
     {
       path: '/',
-      component: Home
-    },
-    {
-      path: '/home',
-      name: 'Home',
-      component: Home
+      name: 'Index',
+      component: Index
     },
     {
       path: '/login',
       name: 'Login',
       component: Login
+    },
+    {
+      path: '/home',
+      name: 'Home',
+      component: Home
     },
   ]
 })
@@ -30,6 +32,8 @@ const router = new Router({
 router.beforeEach((to, from, next) => {
   // 如果跳转的目的路径是 login 界面, 不做操作
   if (to.path === '/login') {
+    next()
+  } else if (to.path === '/') {
     next()
   } else {
     /**

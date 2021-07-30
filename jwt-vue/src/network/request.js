@@ -22,8 +22,11 @@ export function request(config) {
      */
     req.interceptors.response.use(response => {
       const token = response.headers.authorization
+      const canNoLogin = response.data;
       if (token) {
         localStorage.setItem('authorization', token)
+      } else if (canNoLogin.code===200) { 
+        console.log(canNoLogin.message);
       } else {
         localStorage.removeItem('authorization')
         router.push('/login')

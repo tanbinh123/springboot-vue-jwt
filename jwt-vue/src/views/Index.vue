@@ -1,33 +1,30 @@
 <template>
-  <el-row type="flex" justify="center" align="middle" class="main">
-    <el-col :span="12">
-      <el-button @click="exit">注销</el-button>
-      <el-button @click="test">测试</el-button>
-    </el-col>
-  </el-row>
+  <div class="index">
+    主页
+    <el-button @click="toLogin">跳转到登录</el-button>
+    <el-button @click="test1">展示</el-button>
+    <el-button @click="test2">测试</el-button>
+  </div>
 </template>
 
 <script>
 import {request} from '../network/request'
 export default {
-  name: 'Home',
+  name: 'Index',
   methods: {
-    exit() {
-      request({ method: 'get', url: '/exit',
-        params: {
-          uid: localStorage.getItem('uid')
+    toLogin() {
+      this.$router.push('/login')
+    },
+    test1() {
+      request({ method: 'get', url: '/excHello', }).then(res => {
+        if (res.message) {
+          this.$message(res.message)
         }
-      }).then(() => {
-        //用户注销后清除本地 Token
-        localStorage.removeItem('authorization')
-        //并跳转到登录界面
-        this.$router.push('/login')
-        this.$message('注销成功')
       }).catch(err => {
         console.log(err)
       })
     },
-    test() {
+    test2() {
       request({ method: 'get', url: '/hello', }).then(res => {
         if (res) {
           //Token未过期则会正常返回'Hello, world!'信息
@@ -45,7 +42,7 @@ export default {
 </script>
 
 <style scoped>
-.main {
+.index {
   height: 200px;
   text-align: center;
 }
